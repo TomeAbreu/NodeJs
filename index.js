@@ -68,6 +68,21 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({
       error: "Content Missing in Request",
     });
+  } else if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "Name or Number is missing in Request",
+    });
+  }
+
+  //Check if name already exists in Phonebook list
+  const duplicateName = persons.find((person) => {
+    return person.name === body.name;
+  });
+
+  if (duplicateName) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
   }
   const newId = generateId();
 
@@ -78,8 +93,8 @@ app.post("/api/persons", (request, response) => {
   };
 
   persons = persons.concat(newPerson);
-  //response.status(201).json(newPerson);
-  response.status(201).json(newPerson);
+
+  return response.status(201).json(newPerson);
 });
 
 const generateId = () => {
