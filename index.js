@@ -37,12 +37,14 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
+morgan.token("body", (req, res) => JSON.stringify(req.body));
+
 //App to use Middleware to parse all request to JSON
 app.use(express.json());
 //App to use our Custom Middleware
 app.use(requestLogger);
 
-app.use(morgan("tiny"));
+app.use(morgan(":method :url :status :response-time ms :body"));
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
