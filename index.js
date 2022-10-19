@@ -42,7 +42,7 @@ app.use(express.json());
 //App to use our Custom Middleware
 app.use(requestLogger);
 
-app.use(morgan("combined"));
+app.use(morgan("tiny"));
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
