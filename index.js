@@ -1,7 +1,9 @@
 const express = require("express");
-const app = express();
 
-app.use(express.json());
+//Import middleware morgan
+const morgan = require("morgan");
+
+const app = express();
 
 let persons = [
   {
@@ -25,6 +27,22 @@ let persons = [
     number: "39-23-6423122",
   },
 ];
+
+//Custom Middleware definition for all requests (needs to be implemented before requests)
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path:  ", request.path);
+  console.log("Body:  ", request.body);
+  console.log("---");
+  next();
+};
+
+//App to use Middleware to parse all request to JSON
+app.use(express.json());
+//App to use our Custom Middleware
+app.use(requestLogger);
+
+app.use(morgan("combined"));
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
@@ -73,6 +91,12 @@ app.post("/api/persons", (request, response) => {
       error: "Name or Number is missing in Request",
     });
   }
+
+  const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: "unknown endpoint" });
+  };
+
+  app.use(unknownEndpoint);
 
   //Check if name already exists in Phonebook list
   const duplicateName = persons.find((person) => {
