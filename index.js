@@ -39,15 +39,19 @@ app.get("/info", (request, response) => {
   );
 });
 
-app.get("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find((note) => note.id === id);
+app.get("/api/persons/:id", (request, response) => {
+  console.log("Request to API");
+  const personID = Number(request.params.id);
+  console.log("PERSON ID:", personID);
 
-  if (note) {
-    response.json(note);
+  const person = persons.find((p) => {
+    return p.id === personID;
+  });
+  if (person) {
+    response.json(person);
   } else {
     response.status(404);
-    response.send("Resource is not available");
+    response.send("Person was not present in Phonebook");
   }
 });
 
