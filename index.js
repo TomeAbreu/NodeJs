@@ -30,6 +30,15 @@ app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
 
+app.get("/info", (request, response) => {
+  console.log("Request: ", request);
+  const requestTime = new Date();
+
+  response.send(
+    `<div><h3>Phonebook has info for ${persons.length} people</h3><h3>${requestTime}</h3></div>`
+  );
+});
+
 app.get("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
   const note = notes.find((note) => note.id === id);
