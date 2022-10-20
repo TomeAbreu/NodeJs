@@ -3,6 +3,9 @@ const express = require("express");
 //Import middleware morgan
 const morgan = require("morgan");
 
+//Import middleware cors
+const cors = require("cors");
+
 const app = express();
 
 let persons = [
@@ -39,11 +42,16 @@ const requestLogger = (request, response, next) => {
 
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 
+//App to use Middleware CORS to accept front end app connection
+app.use(cors());
+
 //App to use Middleware to parse all request to JSON
 app.use(express.json());
+
 //App to use our Custom Middleware
 app.use(requestLogger);
 
+//App to use Middleware Morgan
 app.use(morgan(":method :url :status :response-time ms :body"));
 
 app.get("/api/persons", (request, response) => {
