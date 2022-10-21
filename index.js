@@ -49,6 +49,9 @@ app.use(express.json());
 //App to use Middleware CORS to accept front end app connection
 app.use(cors());
 
+//App to use Middleware status to go to folder build and use endpoints from there(front-end app)
+app.use(express.static("build"));
+
 //App to use our Custom Middleware
 app.use(requestLogger);
 
