@@ -1,12 +1,12 @@
 const express = require("express");
 
-//Import middleware morgan
-const morgan = require("morgan");
+const app = express();
 
-//Import middleware cors
+//Import Middleware CORS
 const cors = require("cors");
 
-const app = express();
+//Import middleware morgan
+const morgan = require("morgan");
 
 let persons = [
   {
@@ -32,6 +32,7 @@ let persons = [
 ];
 
 //Custom Middleware definition for all requests (needs to be implemented before requests)
+
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
   console.log("Path:  ", request.path);
@@ -42,11 +43,11 @@ const requestLogger = (request, response, next) => {
 
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 
-//App to use Middleware CORS to accept front end app connection
-app.use(cors());
-
 //App to use Middleware to parse all request to JSON
 app.use(express.json());
+
+//App to use Middleware CORS to accept front end app connection
+app.use(cors());
 
 //App to use our Custom Middleware
 app.use(requestLogger);
@@ -54,23 +55,19 @@ app.use(requestLogger);
 //App to use Middleware Morgan
 app.use(morgan(":method :url :status :response-time ms :body"));
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
-
 app.get("/info", (request, response) => {
-  console.log("Request: ", request);
   const requestTime = new Date();
-
   response.send(
     `<div><h3>Phonebook has info for ${persons.length} people</h3><h3>${requestTime}</h3></div>`
   );
 });
 
+app.get("/api/persons", (request, response) => {
+  response.json(persons);
+});
+
 app.get("/api/persons/:id", (request, response) => {
-  console.log("Request to API");
   const personID = Number(request.params.id);
-  console.log("PERSON ID:", personID);
 
   const person = persons.find((p) => {
     return p.id === personID;
@@ -102,12 +99,6 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: "unknown endpoint" });
-  };
-
-  app.use(unknownEndpoint);
-
   //Check if name already exists in Phonebook list
   const duplicateName = persons.find((person) => {
     return person.name === body.name;
@@ -135,7 +126,8 @@ const generateId = () => {
   return Math.floor(Math.random() * 10000);
 };
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
