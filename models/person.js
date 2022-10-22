@@ -14,7 +14,11 @@ mongoose
 
 //Define personSchema: Tell to Mongo how a person should be storeed in the database
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
   number: String,
 });
 
