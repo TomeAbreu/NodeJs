@@ -59,17 +59,35 @@ app.get("/api/persons", (request, response) => {
 app.get("/api/persons/:id", (request, response) => {
   const personID = request.params.id;
   Person.findById(personID)
-    .then((person) => response.json(person))
-    .catch((error) =>
-      response.status(404).send("Person was not present in the phonebook")
-    );
+    .then((person) => {
+      if (person) {
+        return response.json(person);
+      } else {
+        return response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      return response.status(400).send({ error: "malformatted id" });
+    });
 });
 
 //Delete person by Id
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-  response.status(204).end();
+  console.log("Request param ID:", request.params.id);
+
+  Person.deleteOne({ _id: request.params.id })
+    .then((deletedPerson) => {
+      if (deletedPerson.deletedCount > 0) {
+        return response.status(204).end();
+      } else {
+        return response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      return response
+        .status(400)
+        .send({ error: "Error in request to delete person" });
+    });
 });
 
 //Create entrie in phonebook
