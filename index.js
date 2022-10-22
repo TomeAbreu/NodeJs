@@ -77,13 +77,10 @@ app.get("/api/persons/:id", (request, response, next) => {
 app.delete("/api/persons/:id", (request, response, next) => {
   console.log("Request param ID:", request.params.id);
 
-  Person.findByIdAndDelete(request.params.id)
+  Person.findByIdAndRemove(request.params.id)
     .then((deletedPerson) => {
-      if (deletedPerson.deletedCount > 0) {
-        return response.status(204).end();
-      } else {
-        return response.status(404).end();
-      }
+      console.log(deletedPerson);
+      return response.status(204).end();
     })
     .catch((error) => {
       next(error);
@@ -131,6 +128,24 @@ app.post("/api/persons", (request, response, next) => {
     .catch((error) => {
       next(error);
     });
+});
+
+//Update specific person
+app.put("/api/persons/:id", (req, res, next) => {
+  console.log(req.body);
+  const personToUpdate = {
+    name: req.body.name,
+    number: req.body.number,
+  };
+  Person.findByIdAndUpdate(req.params.id, personToUpdate, { new: true })
+    .then((updatedResult) => {
+      if (updatedResult) {
+        return res.status(200).json(updatedResult);
+      } else {
+        return res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
 //Error Handler Middleware
