@@ -86,33 +86,38 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  //Check if name already exists in Phonebook list
-  const duplicateName = persons.find((person) => {
-    return person.name === body.name;
-  });
+  //Check if name already exists in Phonebook database
+  const duplicateName = Person.find({ name: body.name })
+    .then((person) => {
+      return true;
+    })
+    .catch((error) => {
+      return false;
+    });
 
-  if (duplicateName) {
+  if (duplicateName === true) {
     return response.status(400).json({
       error: "Name must be unique",
     });
   }
-  const newId = generateId();
 
-  const newPerson = {
-    id: newId,
+  //Create new person
+  const newPerson = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(newPerson);
-
-  return response.status(201).json(newPerson);
+  newPerson
+    .save()
+    .then((result) => response.status(201).json(newPerson))
+    .catch((error) => {
+      return response
+        .status(404)
+        .send(
+          "Some error occurred while creating new person in phonebook database"
+        );
+    });
 });
-
-//Generate ID function
-const generateId = () => {
-  return Math.floor(Math.random() * 10000);
-};
 
 const PORT = process.env.PORT;
 
